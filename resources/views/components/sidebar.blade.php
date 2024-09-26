@@ -16,6 +16,14 @@
                 <a href="{{ route('users.index') }}"
                     class="nav-link"><i class="fas fa-users"></i><span>Users</span></a>
             </li>
+            <li class="nav-item">
+                <a href="{{ route('categories.index') }}"
+                    class="nav-link"><i class="fas fa-folder"></i><span>Category</span></a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('products.index') }}"
+                    class="nav-link"><i class="fas fa-folder"></i><span>Products</span></a>
+            </li>
             
         </ul>
     </aside>
