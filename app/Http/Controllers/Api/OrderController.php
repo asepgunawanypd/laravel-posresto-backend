@@ -9,6 +9,19 @@ use App\Models\OrderItem;
 
 class OrderController extends Controller
 {
+
+    //index
+    public function index()
+    {
+        //get data order
+        $orders = \App\Models\Order::all();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $orders
+        ]);
+    }
+
     public function saveOrder(Request $request)
     {
         //validate request

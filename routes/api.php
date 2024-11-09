@@ -26,3 +26,9 @@ Route::post('/save-order', [App\Http\Controllers\Api\OrderController::class, 'sa
 Route::get('/api-discounts', [App\Http\Controllers\Api\DiscountController::class, 'index'])->middleware('auth:sanctum');
 //add discount
 Route::post('/api-discounts', [App\Http\Controllers\Api\DiscountController::class, 'store'])->middleware('auth:sanctum');
+//discount api
+Route::get('/api-orders', [App\Http\Controllers\Api\OrderController::class, 'index'])->middleware('auth:sanctum');
+//tax api
+Route::get('/api-taxs', [App\Http\Controllers\Api\TaxController::class, 'index'])->middleware('auth:sanctum');
+//add tax
+Route::post('/api-taxs', [App\Http\Controllers\Api\TaxController::class, 'store'])->middleware('auth:sanctum');

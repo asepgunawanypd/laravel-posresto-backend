@@ -44,7 +44,8 @@
                                 <div class="float-right">
                                     <form method="GET" action="{{ route('products.index') }}">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search" name="name">
+                                            {{-- <input type="text" class="form-control" placeholder="Search" name="name" value="{{ old('search', $search) }}"> --}}
+                                            <input type="text" class="form-control" name="search" value="{{ old('search', $search) }}" placeholder="Search">
                                             <div class="input-group-append">
                                                 <button class="btn btn-primary"><i class="fas fa-search"></i></button>
                                             </div>

@@ -8,10 +8,19 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::paginate(10);
-        return view('pages.products.index', compact('products'));
+        // $products = Product::paginate(10);
+        // Retrieve the search query from the request
+        $search = $request->get('search', '');
+
+        $products = Product::with('category')
+            ->where('name', 'like', '%' . $search . '%')
+            ->orderBy('id', 'desc')
+            ->paginate(10);
+
+
+        return view('pages.products.index', compact('products', 'search'));
     }
 
     public function create()

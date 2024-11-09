@@ -33,7 +33,7 @@
                         class="search-close"><i class="fas fa-times"></i></a>
                 </div>
                 <div class="search-item">
-                    <a href="#">#Stisla</a>
+                    <a href="#">#POS</a>
                     <a href="#"
                         class="search-close"><i class="fas fa-times"></i></a>
                 </div>

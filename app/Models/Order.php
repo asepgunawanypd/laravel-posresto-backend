@@ -21,4 +21,11 @@ class Order extends Model
         'nama_kasir',
         'transaction_time'
     ];
+
+    // Define the relationship with OrderItem
+
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }
