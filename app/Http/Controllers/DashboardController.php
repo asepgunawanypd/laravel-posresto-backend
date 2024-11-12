@@ -14,44 +14,56 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Fetch sales data aggregated by day
-        $salesData = Order::selectRaw('DATE(created_at) as date, SUM(sub_total) as total')
-            ->groupBy('date')
-            ->orderBy('date')
-            ->pluck('total', 'date');
+        // Get the current year and month
+        $year = Carbon::now()->year;
+        $month = Carbon::now()->month;
 
-        // Prepare the sales data for each day
+        // Fetch sales data aggregated by day for the current month
+        $salesData = Order::selectRaw('DAY(created_at) as day, SUM(total) as total')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->groupBy('day')
+            ->orderBy('day')
+            ->pluck('total', 'day');
+
+        // Prepare the sales data for each day from 1 to 31
         $dates = [];
         $sales = [];
+        $daysInMonth = Carbon::now()->daysInMonth;
 
-        // Loop through the last 30 days to ensure you have a full month of data
-        for ($i = 29; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i)->toDateString(); // Get the date
-            $dates[] = $date; // Store the date
-            $sales[] = isset($salesData[$date]) ? $salesData[$date] : 0; // Store sales or 0
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $dates[] = Carbon::create($year, $month, $day)->toDateString(); // Store the date in Y-m-d format
+            $sales[] = isset($salesData[$day]) ? $salesData[$day] : 0; // Store sales for the day or 0 if no sales
         }
 
+        // Fetch top 5 products by quantity sold for the current month
         $products = OrderItem::join('products', 'order_items.product_id', '=', 'products.id')
-            ->select('products.name as product_name', OrderItem::raw('SUM(order_items.quantity) as total_quantity'))
+            ->select('products.name as product_name', DB::raw('SUM(order_items.quantity) as total_quantity'))
+            ->whereYear('order_items.created_at', $year)
+            ->whereMonth('order_items.created_at', $month)
             ->groupBy('products.name')
             ->orderByDesc('total_quantity')
             ->limit(5)
             ->get();
 
-        // Get the current month
-        $currentMonth = Carbon::now()->month;
-
         // Calculate total sales for the current month
         $totalSales = DB::table('orders')
-            ->whereMonth('created_at', $currentMonth)
-            ->sum('sub_total'); // Adjust 'amount' to match the column name in your database
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->sum('total');
+
+        // Calculate total items sold for the current month
         $productSales = DB::table('order_items')
-            ->whereMonth('created_at', $currentMonth)
-            ->sum('quantity'); // Adjust 'amount' to match the column name in your database
-        $totalItems = DB::table('products')
-            ->count('id');
-        $totalUsers = DB::table('users')
-            ->count('id');
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->sum('quantity');
+
+        // Count total products
+        $totalItems = DB::table('products')->count();
+
+        // Count total users
+        $totalUsers = DB::table('users')->count();
+
         // Pass the data to the view
         return view('pages.dashboard', compact('sales', 'dates', 'products', 'totalSales', 'productSales', 'totalItems', 'totalUsers'));
     }

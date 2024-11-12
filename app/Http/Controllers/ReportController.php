@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use Barryvdh\DomPDF\PDF;
 //use App\Models\Report as ModelsReport;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 
 class ReportController extends Controller
 {
@@ -40,10 +42,40 @@ class ReportController extends Controller
         })->get();
 
         // Calculate total amount
-        $totalAmount = $sales->sum('sub_total');
+        $totalAmount = $sales->sum('total');
 
         return view('pages.reports.index', compact('sales', 'startDate', 'endDate', 'totalAmount'));
     }
+
+    public function generatePdf(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+        // $sales = Order::whereBetween('transaction_time', [$startDate, $endDate])->get();
+
+        $sales = Order::when($startDate, function ($query) use ($startDate) {
+            return $query->where('created_at', '>=', $startDate);
+        })->when($endDate, function ($query) use ($endDate) {
+            return $query->where('created_at', '<=', $endDate);
+        })->get();
+
+        // Calculate total amount
+        $totalAmount = $sales->sum('total');
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('pages.reports.generatepdf', compact('sales', 'startDate', 'endDate', 'totalAmount'));
+
+        // Download the PDF file
+        return $pdf->download('report-transaction.pdf');
+    }
+
+
 
     public function generateReportDetails(Request $request)
     {
@@ -58,34 +90,45 @@ class ReportController extends Controller
             ->get();
 
         // Calculate total amount
-        $totalAmount = $details->sum('sub_total');
-
+        // Calculate total amount based on quantity * price for each order detail
+        $totalAmount = $details->flatMap(function ($order) {
+            return $order->orderDetails->map(function ($detail) {
+                return $detail->quantity * $detail->product->price;
+            });
+        })->sum();
 
         return view('pages.reports.detail', compact('details', 'totalAmount'));
     }
 
-    public function generateReportDetail(Request $request)
+    public function exportpdf(Request $request)
     {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
-        // Retrieve orders with their products and calculate the total for each order
-        $orders = Order::with('products')
-            ->when($startDate, function ($query) use ($startDate) {
-                return $query->where('created_at', '>=', $startDate);
-            })
-            ->when($endDate, function ($query) use ($endDate) {
-                return $query->where('created_at', '<=', $endDate);
-            })
+        $details = Order::with(['orderDetails.product'])
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            // ->paginate(5)
+            // ->appends($request->except('page'));
             ->get();
 
-        // Calculate total amount for each order
-        foreach ($orders as $order) {
-            $order->total_amount = $order->products->sum(function ($product) {
-                return $product->pivot->quantity * $product->pivot->price;
+        // Calculate total amount
+        // Calculate total amount based on quantity * price for each order detail
+        $totalAmount = $details->flatMap(function ($order) {
+            return $order->orderDetails->map(function ($detail) {
+                return $detail->quantity * $detail->product->price;
             });
-        }
+        })->sum();
 
-        return view('pages.reports.detail', compact('orders', 'startDate', 'endDate'));
+        // Share data to the view for PDF
+        // $pdf = PDF::loadView('pages.reports.pdf_detail', compact('details', 'totalAmount', 'startDate', 'endDate'));
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('pages.reports.exportpdf', compact('details', 'totalAmount', 'startDate', 'endDate'));
+
+        // Download the PDF file
+        return $pdf->download('report-details.pdf');
+
+        //return view('pages.reports.detail', compact('details', 'totalAmount'));
     }
 }

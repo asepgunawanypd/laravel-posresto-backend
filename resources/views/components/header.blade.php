@@ -9,7 +9,7 @@
                     data-toggle="search"
                     class="nav-link nav-link-lg d-sm-none"><i class="fas fa-search"></i></a></li>
         </ul>
-        <div class="search-element">
+        {{-- <div class="search-element">
             <input class="form-control"
                 type="search"
                 placeholder="Search"
@@ -87,7 +87,7 @@
                     </a>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </form>
     <ul class="navbar-nav navbar-right">
         <li class="dropdown dropdown-list-toggle"><a href="#"

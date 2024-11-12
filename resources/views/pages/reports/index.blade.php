@@ -27,8 +27,6 @@
                         @include('layouts.alert')
                     </div>
                 </div>
-
-
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="card">
@@ -36,8 +34,8 @@
                                 <h4>All Datas</h4>
                             </div>
                             <div class="card-body">
-                                
                                 <div class="float-left">
+                                    <!-- Generate Report Form -->
                                     <form action="{{ route('sales.report.generate') }}" method="POST">
                                         @csrf
                                         <div class="row">
@@ -50,17 +48,27 @@
                                                 <input type="date" name="end_date" class="form-control" required>
                                             </div>
                                             <div class="col-md-4 d-flex align-items-end">
-                                                <button type="submit" class="btn btn-primary">Generate Report</button>
+                                                <button type="submit" class="btn btn-primary w-100">Generate Report</button>
                                             </div>
                                         </div>
                                     </form>
+                            
+                                    <!-- Export to PDF Button -->
+                                    @if(isset($sales))
+                                    <form action="{{ route('sales.report.generatepdf') }}" method="POST" target="_blank" class="mt-3">
+                                        @csrf
+                                        <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+                                        <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+                                        <button type="submit" class="btn btn-success w-100">Export to PDF</button>
+                                    </form>
+                                    @endif
                                 </div>
-
+                            
                                 <div class="clearfix mb-3"></div>
-
+                            
+                                <!-- Sales Table -->
                                 <div class="table-responsive">
                                     @if(isset($sales))
-                                    {{-- <h2 class="mt-4">Sales Report from {{ $startDate->format('Y-m-d') }} to {{ $endDate->format('Y-m-d') }}</h2> --}}
                                     <table class="table-striped table">
                                         <tr>
                                             <th>ID</th>
@@ -68,26 +76,24 @@
                                             <th>Total Item</th>
                                             <th>Tax</th>
                                             <th>Discount</th>
-                                            <th>Subtotal</th>
+                                            <th>Total</th>
                                             <th>Cashier</th>
-                                            
                                         </tr>
                                         <tbody>
                                             @forelse($sales as $sale)
-                                                <tr>
-                                                    <td>{{ $sale->id }}</td>
-                                                    {{-- <td>{{ $sale->transaction_time->format('Y-m-d') }}</td> --}}
-                                                    <td>{{ $sale->created_at->format('Y-m-d') }}</td>
-                                                    <td>{{ $sale->total_item }}</td>
-                                                    <td>{{ number_format($sale->tax) }}</td>
-                                                    <td>{{ $sale->discount }}</td>
-                                                    <td>{{ number_format($sale->sub_total) }}</td>
-                                                    <td>{{ $sale->nama_kasir }}</td>
-                                                </tr>
+                                            <tr>
+                                                <td>{{ $sale->id }}</td>
+                                                <td>{{ $sale->created_at->format('Y-m-d') }}</td>
+                                                <td>{{ $sale->total_item }}</td>
+                                                <td>{{ number_format($sale->tax) }}</td>
+                                                <td>{{ $sale->discount }}</td>
+                                                <td>{{ number_format($sale->total) }}</td>
+                                                <td>{{ $sale->nama_kasir }}</td>
+                                            </tr>
                                             @empty
-                                                <tr>
-                                                    <td colspan="4" class="text-center">No sales found for the selected period.</td>
-                                                </tr>
+                                            <tr>
+                                                <td colspan="7" class="text-center">No sales found for the selected period.</td>
+                                            </tr>
                                             @endforelse
                                         </tbody>
                                         <tfoot>
@@ -99,12 +105,9 @@
                                         </tfoot>
                                     </table>
                                     @endif
-                                    {{-- <div class="float-right">
-                                        {{ $reports->withQueryString()->links() }}
-                                    </div> --}}
                                 </div>
-                                
                             </div>
+                            
                         </div>
                     </div>
                 </div>
