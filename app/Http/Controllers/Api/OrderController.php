@@ -11,10 +11,24 @@ class OrderController extends Controller
 {
 
     //index
+    // public function index()
+    // {
+    //     //get data order
+    //     $orders = \App\Models\Order::all();
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'data' => $orders
+    //     ]);
+    // }
+
     public function index()
     {
-        //get data order
-        $orders = \App\Models\Order::all();
+        // Get today's date
+        $today = now()->toDateString();
+
+        // Get orders for today
+        $orders = \App\Models\Order::whereDate('created_at', $today)->get();
 
         return response()->json([
             'status' => 'success',

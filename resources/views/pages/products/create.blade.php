@@ -61,18 +61,20 @@
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label>Price</label>
+                                <label>Price (IDR)</label>
                                 <input type="number"
-                                    class="form-control @error('price')
-                                is-invalid
-                            @enderror"
-                                    name="price">
+                                       class="form-control @error('price') is-invalid @enderror"
+                                       name="price"
+                                       step="1000" 
+                                       placeholder="10000"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                 @error('price')
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
                                 @enderror
                             </div>
+                            
                             <div class="form-group">
                                 <label>Stock</label>
                                 <input type="number"
