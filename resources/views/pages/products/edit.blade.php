@@ -66,8 +66,8 @@
                                 <input type="number"
                                        class="form-control @error('price') is-invalid @enderror"
                                        name="price"
-                                       step="1000" 
-                                       placeholder="10000"
+                                       placeholder="Enter the price in IDR"
+                                       step="any"
                                        oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                 @error('price')
                                     <div class="invalid-feedback">
