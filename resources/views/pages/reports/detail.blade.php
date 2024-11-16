@@ -60,6 +60,14 @@
                                         <button type="submit" class="btn btn-success w-100">Export to PDF</button>
                                     </form>
                                     @endif
+                                    @if(isset($details))
+                                    <form action="{{ route('details.report.exceldetails') }}" method="POST" class="mt-3">
+                                        @csrf
+                                        <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+                                        <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+                                        <button type="submit" class="btn btn-info w-100">Export to Excel</button>
+                                    </form>
+                                    @endif
                                 </div>
                             
                                 <div class="clearfix mb-3"></div>
@@ -73,8 +81,9 @@
                                                 <th>Detail</th>
                                                 <th>ID</th>
                                                 <th>Transaction Date</th>
+                                                <th>Discount</th>
                                                 <th>Cashier</th>
-                                                <th>Total Amount</th>
+                                                <th>Total</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -94,8 +103,9 @@
                                                     </td>
                                                     <td>{{ $sale->id }}</td>
                                                     <td>{{ $sale->transaction_time }}</td>
+                                                    <td>{{ $sale->discount }}</td>
                                                     <td>{{ $sale->nama_kasir }}</td>
-                                                    <td>{{ number_format($orderTotal, 2) }}</td>
+                                                    <td>{{ number_format($sale->total, 0) }}</td>
                                                 </tr>
                             
                                                 <tr class="collapse" id="details-{{ $sale->id }}">

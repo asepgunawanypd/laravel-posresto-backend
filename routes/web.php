@@ -21,11 +21,13 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('products', ProductController::class);
     Route::resource('categories', CategoryController::class);
-    //Route::resource('reports', ReportController::class);
     Route::get('/sales-report', [ReportController::class, 'index'])->name('sales.report');
     Route::post('/sales-report', [ReportController::class, 'generateReport'])->name('sales.report.generate');
     Route::post('/pdf-sales-report', [ReportController::class, 'generatePdf'])->name('sales.report.generatepdf');
+    Route::post('/sales-export-excel', [ReportController::class, 'generateExcel'])
+        ->name('sales.report.generateexcel');
     Route::get('/details-report', [ReportController::class, 'details'])->name('details.report');
     Route::post('/details-report', [ReportController::class, 'generateReportDetails', 'exportpdf'])->name('details.report.generatedetails');
     Route::post('/pdf-details-report', [ReportController::class, 'exportpdf'])->name('details.report.exportpdf');
+    Route::post('/details-excel', [ReportController::class, 'generateExcelDetails'])->name('details.report.exceldetails');
 });

@@ -62,6 +62,15 @@
                                         <button type="submit" class="btn btn-success w-100">Export to PDF</button>
                                     </form>
                                     @endif
+                                    <!-- Export to Excel Button -->
+                                    @if(isset($sales))
+                                    <form action="{{ route('sales.report.generateexcel') }}" method="POST" class="mt-3">
+                                        @csrf
+                                        <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+                                        <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+                                        <button type="submit" class="btn btn-info w-100">Export to Excel</button>
+                                    </form>
+                                    @endif
                                 </div>
                             
                                 <div class="clearfix mb-3"></div>
